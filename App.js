@@ -45,8 +45,23 @@ export default class App extends React.Component {
     })
   }
 
+  checkAnswer = (choice) => {
+    let result = false;
+
+    if (choice === 'higher') {
+      result = this.cardValues[this.state.currentCard.value] > this.state.lastCardValue;
+    } else if (choice === 'lower') {
+      result = this.cardValues[this.state.currentCard.value] < this.state.lastCardValue;
+    }
+
+    if (result) {
+      this.setState({
+        score: this.state.score + 1
+      });
+    }
+  }
+
   drawCard = async (choice = null) => {
-    let result;
 
     if (this.state.currentCard) {
       this.state.lastCardValue = this.cardValues[this.state.currentCard.value]
@@ -60,22 +75,16 @@ export default class App extends React.Component {
         currentCard: responseJson.cards[0]
       })
 
-    if (choice) {
-      if (choice === 'higher') {
-        result = this.cardValues[this.state.currentCard.value] > this.state.lastCardValue;
-      } else if (choice === 'lower') {
-        result = this.cardValues[this.state.currentCard.value] < this.state.lastCardValue;
-      }
+    if (this.state.cardsRemaining < 1) {
+      this.newGame();
     }
 
-    if (result) {
-      this.setState({
-        score: this.state.score + 1
-      });
+    if (choice) {
+      this.checkAnswer(choice);
     }
   }
 
-  gameOn = () => {
+  showButtons = () => {
     if (this.state.currentCard) {
       return (
         <View>
@@ -106,10 +115,10 @@ export default class App extends React.Component {
   render() {
     return (
       <View>
-        <Text>
+        <Text style={{ fontSize: 20 }}>
           Remainin cards: {this.state.cardsRemaining}
         </Text>
-        <Text>
+        <Text style={{ fontSize: 20 }}>
           Current score: {this.state.score}
         </Text>
         <Text>
@@ -124,7 +133,7 @@ export default class App extends React.Component {
           onPress={() => this.drawCard()}
         />
         {this.renderCard()}
-        {this.gameOn()}
+        {this.showButtons()}
       </View>
     )
   }
